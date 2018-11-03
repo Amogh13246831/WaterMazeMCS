@@ -5,7 +5,7 @@ public class Arena extends PhysData{
 	
 	ArenaCell arena[][];
 	ArenaCell memArena[][];
-	
+
 	boolean isFirstTrial;
 	double invDist;
 	int stepCount = 0;
@@ -26,6 +26,12 @@ public class Arena extends PhysData{
 	{
 		arena = new ArenaCell[diameter][diameter];
 		memArena = new ArenaCell[diameter][diameter];
+		for(int i=0; i< diameter; i++)
+			for(int j=0; j<diameter; j++)
+			{
+				arena[i][j] = new ArenaCell();
+				memArena[i][j] = new ArenaCell();
+			}
 		
 		center = new int[] {radius, radius};
 		platQuad = new int[] {0, 90};
@@ -41,11 +47,28 @@ public class Arena extends PhysData{
 		memArena[platform[0]][platform[1]].comWeight = 1;
 		
 		path = new PathType[steps];
+		for(int i=0; i<steps; i++)
+			path[i] = new PathType();
 	}
 
-	double centerDist(int x, int y) // distance of (x,y) from center of the arena
+	double centerDist(double x, double y) // distance of (x,y) from center of the arena
 	{
 		return Math.sqrt(Math.pow(center[0]-x,2) + Math.pow(center[1]-y,2)); 
+	}
+	
+	void getNewArena()     
+	{
+		// initialise the maze and path storage to be used in the current trial
+		arena = new ArenaCell[diameter][diameter];
+		for(int i=0; i< diameter; i++)
+			for(int j=0; j<diameter; j++)
+			{
+				arena[i][j] = new ArenaCell();
+			}
+		
+		path = new PathType[steps];
+		for(int i=0; i<steps; i++)
+			path[i] = new PathType();
 	}
 	
 	void randomizeStart()
@@ -69,7 +92,7 @@ public class Arena extends PhysData{
 		*/ 
 		sAngle = degToRad(temp);
 		startCell[0] = (int) (center[0] + radius*Math.cos(sAngle)); 
-		startCell[1] = (int) (center[0] + radius*Math.sin(sAngle)); 
+		startCell[1] = (int) (center[1] + radius*Math.sin(sAngle)); 
 	}
 	
 	void findAverageDirection()
@@ -268,7 +291,7 @@ public class Arena extends PhysData{
 				else if(arena[i][j].visited > 0 && arena[i][j].dirVect != -1)
 					System.out.print(radToDeg(arena[i][j].dirVect) + "\t");
 				else
-					System.out.print("-1 + \t");
+					System.out.print(-1 + "\t");
 			}
 			System.out.println("\n\n");
 		}
@@ -285,7 +308,7 @@ public class Arena extends PhysData{
 				else if(arena[i][j].visited > 0)
 					System.out.print(radToDeg(arena[i][j].centerAngle) + "\t");
 				else
-					System.out.print("-1 + \t");
+					System.out.print(-1 + "\t");
 			}
 			System.out.println("\n\n");
 		}
@@ -298,15 +321,15 @@ public class Arena extends PhysData{
 				if(centerDist(i,j) > radius)
 					System.out.print("\t");
 				else if(arena[i][j].visited > 0)
-					System.out.print(radToDeg(arena[i][j].comWeight) + "\t");
+					System.out.print(arena[i][j].comWeight + "\t");
 				else
-					System.out.print("-1 + \t");
+					System.out.print(-1 + "\t");
 			}
 			System.out.println("\n\n");
 		}
 	 
 		System.out.println("Distance of COM to platform: " + (1/invDist));
-		System.out.print("Inverse Distance: " + invDist);
+		System.out.println("Inverse Distance: " + invDist);
 	}
 
 	void printStored()
@@ -325,7 +348,7 @@ public class Arena extends PhysData{
 				else if(memArena[i][j].visited > 0 && memArena[i][j].dirVect != -1)
 					System.out.print(radToDeg(memArena[i][j].dirVect) + "\t");
 				else
-					System.out.print("-1 + \t");
+					System.out.print(-1 + "\t");
 			}
 			System.out.println("\n\n");
 		}
@@ -338,9 +361,9 @@ public class Arena extends PhysData{
 				if(centerDist(i,j) > radius)
 					System.out.print("\t");
 				else if(memArena[i][j].visited > 0)
-					System.out.print(radToDeg(memArena[i][j].comWeight) + "\t");
+					System.out.print(memArena[i][j].comWeight + "\t");
 				else
-					System.out.print("-1 + \t");
+					System.out.print(-1 + "\t");
 			}
 			System.out.println("\n\n");
 		}
@@ -353,9 +376,9 @@ public class Arena extends PhysData{
 				if(centerDist(i,j) > radius)
 					System.out.print("\t");
 				else if(memArena[i][j].visited > 0)
-					System.out.print(radToDeg(memArena[i][j].platWeight) + "\t");
+					System.out.print(memArena[i][j].platWeight + "\t");
 				else
-					System.out.print("-1 + \t");
+					System.out.print(-1 + "\t");
 			}
 			System.out.println("\n\n");
 		}
@@ -368,9 +391,9 @@ public class Arena extends PhysData{
 				if(centerDist(i,j) > radius)
 					System.out.print("\t");
 				else if(memArena[i][j].visited > 0)
-					System.out.print(radToDeg(memArena[i][j].platWeight*memArena[i][j].comWeight) + "\t");
+					System.out.print(memArena[i][j].platWeight*memArena[i][j].comWeight + "\t");
 				else
-					System.out.print("-1 + \t");
+					System.out.print(-1 + "\t");
 			}
 			System.out.println("\n\n");
 		}

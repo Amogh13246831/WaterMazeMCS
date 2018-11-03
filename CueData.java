@@ -19,6 +19,23 @@ public class CueData extends PhysData{
 		confidence = new double[diameter][diameter];
 	}
 	
+	public CueData(CueData other)
+	{
+		cueNumber = other.cueNumber;
+		xPos = other.xPos;
+		yPos = other.yPos;
+		randVect = new double[diameter][diameter];
+		confidence = new double[diameter][diameter];
+		for(int i=0; i<diameter; i++)
+			for(int j=0; j<diameter; j++) 
+			{
+				randVect[i][j] = other.randVect[i][j];
+				confidence[i][j] = other.confidence[i][j];
+			}
+		platVect = other.platVect;
+		platDist = other.platDist;
+	}
+	
 	void setDetails(int px, int py)
 	{
 		/* set platform distance and platform angle from the cue

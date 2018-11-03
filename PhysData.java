@@ -2,7 +2,7 @@ package watermazeData;
 
 public class PhysData {
 	
-	static int steps = 15;
+	static int steps = 60;
 	static double stepSize = 1.5;
 	static int diameter = 15;
 	static int radius = diameter/2;

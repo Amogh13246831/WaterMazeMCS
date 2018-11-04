@@ -1,12 +1,15 @@
 package watermazeData;
 import java.util.Scanner;
+import java.io.*;
 
-public class Simulation extends PhysData{
+public class Simulation extends PhysData implements Serializable {
+	
 	
 	CueData visCues[];
 	ParticleData rat;
 	Arena maze;
 	
+	private static final long serialVersionUID = 1L;
 	boolean isFirstTrial;
 	int simId;
 	int curX, curY;
@@ -36,6 +39,19 @@ public class Simulation extends PhysData{
 		}
 		
 		in.close();
+	}
+	
+	public Simulation(Simulation s)
+	{
+		simId = s.simId;
+		numCues = s.numCues;
+		successes = s.successes;
+		visCues = s.visCues;
+		maze = s.maze;
+		rat = s.rat;
+		isFirstTrial = s.isFirstTrial;
+		curX = s.curX;
+		curY = s.curY;
 	}
 	
 	void putCues()   // print all cues
@@ -224,5 +240,52 @@ public class Simulation extends PhysData{
 		maze.updateMemory();         // update trial results to stored arena
 		updateCues();                // update cue results
 		printInfo();
+	}
+	
+	void storeData(String filename)
+	{
+		FileOutputStream fOut = null;
+		ObjectOutputStream oOut = null;
+		try{
+			fOut = new FileOutputStream(new File(filename));
+			oOut = new ObjectOutputStream(fOut);
+			oOut.writeObject(this);
+		} catch(IOException e) {
+			System.out.println("File error: " + e);
+		} finally {
+			try {
+				fOut.close();
+				oOut.close();
+			} catch(IOException e) {
+				System.out.println("File error: " + e);
+			}
+		}
+		
+	}
+	
+	static Simulation readData(String filename)
+	{
+		FileInputStream fIn = null;
+		ObjectInputStream oIn = null;
+		try{
+			fIn = new FileInputStream(new File(filename));
+			oIn = new ObjectInputStream(fIn);
+			try {
+				return (Simulation) (oIn.readObject());		
+			} catch(ClassNotFoundException e) {
+				System.out.println("File Error " + e);
+			}
+			
+		} catch(IOException e) {
+			System.out.println("File error: " + e);
+		} finally {
+			try {
+				fIn.close();
+				oIn.close();
+			} catch(IOException e) {
+				System.out.println("File error: " + e);
+			}
+		}
+		return null;
 	}
 }

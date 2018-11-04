@@ -1,7 +1,9 @@
 package watermazeData;
+import java.io.Serializable;
 
-public class ParticleData {
-	
+public class ParticleData implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 	double xPos;
 	double yPos;
 	double direction;

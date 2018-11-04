@@ -4,7 +4,11 @@ public class DriverMain {
 
 	public static void main(String[] args) {
 		
-		new Simulation(1).runSimulation();
+		Simulation s = new Simulation(1);
+		s.runSimulation();
+		s.storeData("testsim.txt");
+		Simulation t = Simulation.readData("testsim.txt");
+		t.runSimulation();
 	}
 
 }

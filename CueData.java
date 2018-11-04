@@ -1,7 +1,9 @@
 package watermazeData;
+import java.io.Serializable;
 
-public class CueData extends PhysData{
-	
+public class CueData extends PhysData implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 	int cueNumber;  
 	int xPos;
 	int yPos;

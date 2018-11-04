@@ -1,8 +1,10 @@
 package watermazeData;
+import java.io.Serializable;
 
-
-public class Arena extends PhysData{
+public class Arena extends PhysData implements Serializable {
 	
+
+	private static final long serialVersionUID = 1L;
 	ArenaCell arena[][];
 	ArenaCell memArena[][];
 
@@ -16,7 +18,8 @@ public class Arena extends PhysData{
 	int platQuad[];
 	int centerMass[];
 	
-	class PathType{
+	class PathType implements Serializable {
+		private static final long serialVersionUID = 1L;
 		int x = 0;
 		int y = 0;
 	}

@@ -11,14 +11,16 @@ public class mazeDrawing extends JPanel {
 	int size = 400;
 	int baseX = 10, baseY = 10;
 	Simulation sim;
-	int numCues = 0;
-	boolean cueSet = false;
 	PathType[] path;
 	
 
-	public void initialize(Simulation s, PathType[] p) {
-		sim = s;
-		path = p;
+	public void initialize(int fileNo, int numCues) {
+		sim = new Simulation(fileNo, numCues);
+	}
+	
+	public void runSim() {
+		sim.runSimulation();
+		path = sim.maze.path;
 	}
 	
 	int scale(int x) {
@@ -51,5 +53,5 @@ public class mazeDrawing extends JPanel {
 			}
 		}
 	}
-
+	
 }

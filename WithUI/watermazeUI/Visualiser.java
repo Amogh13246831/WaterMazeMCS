@@ -8,22 +8,24 @@ import backEnd.PhysData.PathType;
 public class Visualiser extends Applet {
 
 	private static final long serialVersionUID = 1L;
-	int size= 500;
-	int baseX = 10, baseY = 10;
+	int size = 500;
+	int baseX = 50, baseY = 50;
 	Simulation s;
 	int numCues = 0;
 	boolean cueSet = false;
-	
-
 	PathType[] path;
 
 	public void init() {
-		this.resize(1000, 750);
+		this.resize(1000, 800);
 		
 		Button b = new Button("Run");
 		add(b);
 		b.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
+				if(s == null) {
+					showStatus("Enter the number of cues before running");
+					return;
+				}
 				s.runSimulation();
 				path = s.maze.path;
 				repaint();
@@ -51,12 +53,21 @@ public class Visualiser extends Applet {
 	}
 	
 	int scale(int x) {
-		return x*size/PhysData.diameter;
+		return x * (size/PhysData.diameter);
 	}
 	
 	public void paint(Graphics g) {
 		if(s != null) {
-			g.drawOval(baseX, baseY, size, size);
+			//g.drawLine(baseX + scale(7), baseY + scale(0), baseX + scale(14), baseY + scale(7));
+			//g.drawLine(baseX + scale(7), baseY + scale(0), baseX + scale(0), baseY + scale(7));
+			//g.drawLine(baseX + scale(7), baseY + scale(14), baseX + scale(14), baseY + scale(7));
+			//g.drawLine(baseX + scale(7), baseY + scale(14), baseX + scale(0), baseY + scale(7));
+			
+			g.drawRect(baseX, baseY, scale(14), scale(14));
+			g.drawOval(baseX, baseY, scale(14), scale(14));
+			
+			//g.drawRect(baseX, baseY, size, size);
+			//g.drawOval(baseX, baseY, size, size);
 			g.setColor(Color.red);
 			g.fillOval(baseX + scale(s.maze.platform[0])-5, baseX+scale(s.maze.platform[1])-5,
 					10, 10);

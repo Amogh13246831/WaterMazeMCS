@@ -6,9 +6,6 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
-import backEnd.Simulation;
-import backEnd.PhysData.PathType;
-
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
@@ -18,12 +15,11 @@ public class builtWin {
 	private JFrame frame;
 	private JTextField cueEntry;
 	private JLabel status;
-	int size = 500;
-	int baseX = 50, baseY = 50;
-	Simulation s;
+	private JTextField iterGet;
+	
+	int iterations  = 1;
 	int numCues = 0;
 	boolean cueSet = false;
-	PathType[] path;
 	mazeDrawing mazeDisplay;
 	
 	/**
@@ -61,14 +57,25 @@ public class builtWin {
 		JButton runIt = new JButton("Run");
 		runIt.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(s == null) {
+				if(!cueSet) {
 					showStatus("Enter the number of cues before running");
 					return;
 				}
-				s.runSimulation();
-				path = s.maze.path;
-				mazeDisplay.initialize(s, path);
-				mazeDisplay.repaint();
+				
+				new Thread() {
+					public void run() {
+						for(int i=0; i<iterations; i++) {
+							mazeDisplay.runSim();
+							mazeDisplay.repaint();
+							try {
+								Thread.sleep(500);
+							} catch(InterruptedException ie) {
+								showStatus("Sleep Interrupted!");
+							}
+						}
+					}
+				}.start();
+				
 			}
 		});
 		runIt.setBounds(30, 50, 89, 23);
@@ -85,7 +92,7 @@ public class builtWin {
 				if(!cueSet) {
 					try {
 						numCues = Integer.parseInt(cueEntry.getText());
-						s = new Simulation(1, numCues);
+						mazeDisplay.initialize(1, numCues);
 						cueSet = true;
 						showStatus("Simulation initialised. Number of cues: " + numCues);
 					} catch(NumberFormatException ne) {
@@ -108,10 +115,31 @@ public class builtWin {
 		status.setBounds(10, 387, 230, 14);
 		frame.getContentPane().add(status);
 		
+		JLabel lblIterations = new JLabel("Iterations:");
+		lblIterations.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblIterations.setBounds(30, 200, 86, 14);
+		frame.getContentPane().add(lblIterations);
+		
+		iterGet = new JTextField();
+		iterGet.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					iterations = Integer.parseInt(iterGet.getText());
+					if(iterations < 1)
+						throw new NumberFormatException();
+					showStatus("Iterations set to " + iterations);
+				} catch(NumberFormatException ne) {
+					showStatus("Enter a valid number of iterations");
+				}
+			}
+		});
+		iterGet.setBounds(30, 215, 86, 20);
+		frame.getContentPane().add(iterGet);
+		iterGet.setColumns(10);
+		
 	}
 	
 	private void showStatus(String message) {
 		status.setText(message);
 	}
-
 }

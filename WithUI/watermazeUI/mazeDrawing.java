@@ -51,12 +51,12 @@ public class mazeDrawing extends JPanel {
 		
 		if(sim != null) {
 			g.setColor(Color.red);
-			g.fillOval(baseX + scale(sim.maze.platform[0])-5, baseX+scale(sim.maze.platform[1])-5,
+			g.fillOval(baseX + scale(sim.maze.platform.x)-5, baseX+scale(sim.maze.platform.y)-5,
 					10, 10);
 			if(path != null) {
 				g.setColor(Color.blue);
 			
-				g.drawLine(baseX + scale(sim.maze.startCell[0]), baseY + scale(sim.maze.startCell[1]), 
+				g.drawLine(baseX + scale(sim.maze.startCell.x), baseY + scale(sim.maze.startCell.y), 
 						baseX + scale(path[0].x), baseY + scale(path[0].y));
 			
 				for(int i=0; i<path.length-1; i++) {

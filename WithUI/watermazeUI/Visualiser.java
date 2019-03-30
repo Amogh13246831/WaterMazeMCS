@@ -69,12 +69,12 @@ public class Visualiser extends Applet {
 			//g.drawRect(baseX, baseY, size, size);
 			//g.drawOval(baseX, baseY, size, size);
 			g.setColor(Color.red);
-			g.fillOval(baseX + scale(s.maze.platform[0])-5, baseX+scale(s.maze.platform[1])-5,
+			g.fillOval(baseX + scale(s.maze.platform.x)-5, baseX+scale(s.maze.platform.y)-5,
 					10, 10);
 			if(path != null) {
 				g.setColor(Color.blue);
 			
-				g.drawLine(baseX + scale(s.maze.startCell[0]), baseY + scale(s.maze.startCell[1]), 
+				g.drawLine(baseX + scale(s.maze.startCell.x), baseY + scale(s.maze.startCell.y), 
 						baseX + scale(path[0].x), baseY + scale(path[0].y));
 			
 				for(int i=0; i<path.length-1; i++) {

@@ -1,11 +1,13 @@
-package watermazeData;
+package backEnd;
+
+import java.io.Serializable;
 
 public class PhysData {
 	
 	static int steps = 60;
 	static double stepSize = 1.5;
-	static int diameter = 15;
-	static int radius = diameter/2;
+	public static int diameter = 15;
+	public static int radius = diameter/2;
 	static int maxCues = 10;
 	static int maxSubjects = 10;
 	
@@ -18,5 +20,19 @@ public class PhysData {
 	{
 		return (int)(angle*180/3.14159);
 	}
-}
+		
+	public class PathType implements Serializable {
+		private static final long serialVersionUID = 1L;
+		public int x = 0;
+		public int y = 0;
+		
+		public PathType() {
 
+		};
+		
+		public PathType(int x, int y) {
+			this.x = x;
+			this.y = y;
+		}
+	}
+}

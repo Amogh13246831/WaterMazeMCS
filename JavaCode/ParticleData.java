@@ -1,4 +1,4 @@
-package watermazeData;
+package backEnd;
 import java.io.Serializable;
 
 public class ParticleData implements Serializable {

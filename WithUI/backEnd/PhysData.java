@@ -7,7 +7,7 @@ public class PhysData {
 	static int steps = 60;
 	static double stepSize = 1.5;
 	public static int diameter = 15;
-	static int radius = diameter/2;
+	public static int radius = diameter/2;
 	static int maxCues = 10;
 	static int maxSubjects = 10;
 	

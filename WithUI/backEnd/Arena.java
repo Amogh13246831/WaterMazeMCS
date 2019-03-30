@@ -49,7 +49,7 @@ public class Arena extends PhysData implements Serializable {
 			path[i] = new PathType();
 	}
 
-	double centerDist(double x, double y) // distance of (x,y) from center of the arena
+	public double centerDist(double x, double y) // distance of (x,y) from center of the arena
 	{
 		return Math.sqrt(Math.pow(center[0]-x,2) + Math.pow(center[1]-y,2)); 
 	}

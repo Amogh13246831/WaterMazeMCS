@@ -25,7 +25,7 @@ public class Simulation extends PhysData implements Serializable {
 		successes = 0;
 		maze = new Arena();
 		rat = new ParticleData();
-
+		numCues = cues;
 		visCues = new CueData[numCues]; 
 		
 		if(numCues != 0)
@@ -61,6 +61,14 @@ public class Simulation extends PhysData implements Serializable {
 		isFirstTrial = s.isFirstTrial;
 		curX = s.curX;
 		curY = s.curY;
+	}
+	
+	public void setCues(PathType[] locs) {
+		for(int i=0; i<numCues; i++)
+		{
+			visCues[i] = new CueData(i, locs[i].x, locs[i].y);
+			visCues[i].setDetails(maze.platform[0], maze.platform[1]);
+		}
 	}
 	
 	void putCues()   // print all cues

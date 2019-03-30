@@ -9,12 +9,17 @@ public class mazeDrawing extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	int size = 400;
-	int baseX = 10, baseY = 10;
+	int baseX = 30, baseY = 10;
 	Simulation sim;
 	PathType[] path;
-	
+	boolean displayLocs = false;
 
 	public void initialize(int fileNo, int numCues) {
+		if(numCues != 0) {
+			displayLocs = true;
+			repaint();
+			numCues = 0;
+		}
 		sim = new Simulation(fileNo, numCues);
 	}
 	
@@ -30,10 +35,21 @@ public class mazeDrawing extends JPanel {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		this.setBackground(Color.WHITE);
+		g.drawOval(baseX, baseY, scale(14), scale(14));
+		
+		if(displayLocs == true) {
+			for(int i=0; i<PhysData.diameter; i++)
+			{	
+				for(int j=0; j<PhysData.diameter; j++)
+					if(sim.maze.centerDist(i,j) > PhysData.radius)
+						g.drawString("\t", baseX + scale(i), baseY + scale(j));
+					else
+						g.drawString("(" + i + ", " + j + ")\t", baseX + scale(i), baseY + scale(j));
+			}
+			displayLocs = false;
+		}
 		
 		if(sim != null) {
-			g.drawOval(baseX, baseY, scale(14), scale(14));
-			
 			g.setColor(Color.red);
 			g.fillOval(baseX + scale(sim.maze.platform[0])-5, baseX+scale(sim.maze.platform[1])-5,
 					10, 10);

@@ -12,8 +12,7 @@ public class CueData extends PhysData implements Serializable {
 	double randVect[][];
 	double confidence[][];
 	
-	public CueData(int number, int x, int y)
-	{
+	public CueData(int number, int x, int y) {
 		cueNumber = number;
 		xPos = x;
 		yPos = y;	
@@ -21,16 +20,14 @@ public class CueData extends PhysData implements Serializable {
 		confidence = new double[diameter][diameter];
 	}
 	
-	public CueData(CueData other)
-	{
+	public CueData(CueData other) {
 		cueNumber = other.cueNumber;
 		xPos = other.xPos;
 		yPos = other.yPos;
 		randVect = new double[diameter][diameter];
 		confidence = new double[diameter][diameter];
 		for(int i=0; i<diameter; i++)
-			for(int j=0; j<diameter; j++) 
-			{
+			for(int j=0; j<diameter; j++) {
 				randVect[i][j] = other.randVect[i][j];
 				confidence[i][j] = other.confidence[i][j];
 			}
@@ -38,8 +35,7 @@ public class CueData extends PhysData implements Serializable {
 		platDist = other.platDist;
 	}
 	
-	void setDetails(int px, int py)
-	{
+	void setDetails(int px, int py) {
 		/* set platform distance and platform angle from the cue
 		  platform distance the is cartesian distance between platform and cue
 		 */
@@ -52,25 +48,21 @@ public class CueData extends PhysData implements Serializable {
 
 		 // initialise confidence from each cell to be (1/Dplat)*(1/Dcell)
 		 for(int i=0; i<diameter; i++)
-			 for(int j=0; j<diameter; j++)
-			 {
+			 for(int j=0; j<diameter; j++) {
 				 celldist = Math.sqrt(Math.pow(i-xPos,2) + Math.pow(j-yPos,2));
 				 confidence[i][j] = 1/(platDist*celldist);
 				 randVect[i][j] = degToRad((int) (Math.random()%360));
 			 }
 	}
 	
-	void printCue()
-	{
+	void printCue() {
 		System.out.println("Cue Number " + cueNumber);
 		double centdist; 
 
 		 // print the confidence and random vector arrays
 		System.out.println("Confidence:");
-		for(int i=0; i<diameter; i++)
-		{
-			for(int j=0; j<diameter; j++)
-			{
+		for(int i=0; i<diameter; i++) {
+			for(int j=0; j<diameter; j++) {
 				centdist = Math.sqrt(Math.pow(radius-i,2) + Math.pow(radius-j,2)); // distance from C = (r,r)
 				if(centdist > radius) 
 					System.out.print("\t");
@@ -81,10 +73,8 @@ public class CueData extends PhysData implements Serializable {
 		}
 
 		System.out.println("Indicated Direction:");
-		for(int i=0; i<diameter; i++)
-		{
-			for(int j=0; j<diameter; j++)
-			{
+		for(int i=0; i<diameter; i++) {
+			for(int j=0; j<diameter; j++) {
 				centdist = Math.sqrt(Math.pow(radius-i,2) + Math.pow(radius-j,2)); // distance from C = (r,r)
 				if(centdist > radius) 
 					System.out.print("\t");

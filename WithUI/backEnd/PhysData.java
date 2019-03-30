@@ -11,13 +11,11 @@ public class PhysData {
 	static int maxCues = 10;
 	static int maxSubjects = 10;
 	
-	double degToRad(int angle) // convert degree to radian
-	{
+	double degToRad(int angle) { // convert degree to radian	
 		return angle*3.14159/180;
 	}
 
-	int radToDeg(double angle)
-	{
+	int radToDeg(double angle) {	
 		return (int)(angle*180/3.14159);
 	}
 		
@@ -25,5 +23,14 @@ public class PhysData {
 		private static final long serialVersionUID = 1L;
 		public int x = 0;
 		public int y = 0;
+		
+		public PathType() {
+
+		};
+		
+		public PathType(int x, int y) {
+			this.x = x;
+			this.y = y;
+		}
 	}
 }

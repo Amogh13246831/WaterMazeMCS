@@ -90,8 +90,8 @@ public class Simulation extends PhysData implements Serializable {
 
 		if(maze.memArena[curX][curY].visited > 0) { // get angle based on memory calculations	
 			tempScore = maze.memArena[curX][curY].comWeight * maze.memArena[curX][curY].platWeight;
-			tempAngle = degToRad((int) Math.floor(Math.random()*360))*(1-tempScore) 
-					+ maze.memArena[curX][curY].dirVect*tempScore;
+			tempAngle = degToRad((int) (Math.floor(Math.random()*360)*(1-tempScore) 
+					+ maze.memArena[curX][curY].dirVect*tempScore));  // BUG FIX ON 2.4.2019, was degToRad() + maze...TempScore!!!
 		}
 		else {
 			tempAngle = degToRad((int) Math.floor(Math.random()*360));
@@ -106,7 +106,7 @@ public class Simulation extends PhysData implements Serializable {
 
 		for(i=0; i<numCues; i++) {                     // get next cells that cues indicate	
 			cueStep[i] = new Pos();
-			cueStep[i].x = rat.xPos + stepSize*Math.cos(visCues[i].randVect[curY][curY]);
+			cueStep[i].x = rat.xPos + stepSize*Math.cos(visCues[i].randVect[curX][curY]);  // BUG FIX ON 2/4/2019, was [curY][curY]
 			cueStep[i].y = rat.yPos + stepSize*Math.cos(visCues[i].randVect[curX][curY]);
 		}
 		

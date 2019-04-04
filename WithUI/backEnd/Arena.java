@@ -13,7 +13,6 @@ public class Arena extends PhysData implements Serializable {
 	int stepCount = 0;	
 
 	
-	PathType center;
 	public PathType startCell;
 	public PathType platform;
 	PathType platQuad;
@@ -45,10 +44,6 @@ public class Arena extends PhysData implements Serializable {
 		path = new PathType[steps];
 		for(int i=0; i<steps; i++)
 			path[i] = new PathType();
-	}
-
-	public double centerDist(double x, double y) { // distance of (x,y) from center of the arena
-		return Math.sqrt(Math.pow(center.x-x,2) + Math.pow(center.y-y,2)); 
 	}
 	
 	void getNewArena() {

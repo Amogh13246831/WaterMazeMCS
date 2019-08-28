@@ -4,8 +4,7 @@ import java.io.*;
 
 public class Simulation extends PhysData implements Serializable {
 	
-	
-	CueData visCues[];
+	VisualCues visCues;
 	ParticleData rat;
 	public Arena maze;
 	
@@ -13,10 +12,9 @@ public class Simulation extends PhysData implements Serializable {
 	boolean isFirstTrial;
 	int simId;
 	int curX, curY;
-	int numCues;
 	int successes;
 	
-	public Simulation(int id, int cues) {
+	public Simulation(int id, int numCues) {
 		Scanner in = new Scanner(System.in);
 		int x, y;
 		
@@ -24,32 +22,40 @@ public class Simulation extends PhysData implements Serializable {
 		successes = 0;
 		maze = new Arena();
 		rat = new ParticleData();
-		numCues = cues;
-		visCues = new CueData[numCues]; 
+		PathType[] cueLocs = new PathType[numCues];
 		
 		if(numCues != 0)
-			for(int i=0; i<diameter; i++)
+			for(int i=0; i<diameter; i++) {
 				for(int j=0; j<diameter; j++)
 					if(maze.centerDist(i,j) > radius)
 						System.out.print("\t");
 					else
 						System.out.print("(" + i + ", " + j + ")\t");
 				System.out.println("\n");
+			}
 		
 		for(int i=0; i<numCues; i++) {
 			System.out.println("Enter coordinates of cue " + i + ": ");
 			x = in.nextInt();
 			y = in.nextInt();
-			visCues[i] = new CueData(i, x, y);
-			visCues[i].setDetails(maze.platform.x, maze.platform.y);
+			cueLocs[i] = new PathType(x, y);
 		}
+		visCues = new VisualCues(cueLocs, maze.platform.x, maze.platform.y);
 		
 		in.close();
 	}
 	
+	public Simulation(int id, PathType[] cueLocs) {
+		
+		simId = id;
+		successes = 0;
+		maze = new Arena();
+		rat = new ParticleData();
+		visCues = new VisualCues(cueLocs, maze.platform.x, maze.platform.y);
+	}
+	
 	public Simulation(Simulation s) {
 		simId = s.simId;
-		numCues = s.numCues;
 		successes = s.successes;
 		visCues = s.visCues;
 		maze = s.maze;
@@ -58,91 +64,27 @@ public class Simulation extends PhysData implements Serializable {
 		curX = s.curX;
 		curY = s.curY;
 	}
-	
-	public void setCues(PathType[] locs) {
-		for(int i=0; i<numCues; i++) {
-			visCues[i] = new CueData(i, locs[i].x, locs[i].y);
-			visCues[i].setDetails(maze.platform.x, maze.platform.y);
-		}
-	}
-	
-	void putCues() {  // print all cues	
-		for(int i=0; i<numCues; i++)
-			visCues[i].printCue();
-	}
 
 	void printInfo() {	  // print all data
 		maze.printArena(); 
-		maze.printStored();
-		putCues();
+		maze.printBayesianStored();
+		visCues.putCues();
 		System.out.println("Total number of successes: " + successes);
 	}
-	
+
 	void nextStep() {
-		double x, y, score = 0, tempScore, tempAngle;
-		int i, best = -1, nx, ny;
-		
-		class Pos {
-			double x;
-			double y;
-		}
-		Pos cueStep[] = new Pos[numCues];
-
-		if(maze.memArena[curX][curY].visited > 0) { // get angle based on memory calculations	
-			tempScore = maze.memArena[curX][curY].comWeight * maze.memArena[curX][curY].platWeight;
-			tempAngle = degToRad((int) (Math.floor(Math.random()*360)*(1-tempScore) 
-					+ maze.memArena[curX][curY].dirVect*tempScore));  // BUG FIX ON 2.4.2019, was degToRad() + maze...TempScore!!!
-		}
-		else {
-			tempAngle = degToRad((int) Math.floor(Math.random()*360));
-		}
-		x = rat.xPos + stepSize*Math.cos(tempAngle);
-		y = rat.yPos + stepSize*Math.sin(tempAngle);
-		while(maze.centerDist(x, y) > radius) {               // get a valid random angle			
-			tempAngle = degToRad((int) Math.floor(Math.random()*360));
-			x = rat.xPos + stepSize*Math.cos(tempAngle);
-			y = rat.yPos + stepSize*Math.sin(tempAngle);
-		} 
-
-		for(i=0; i<numCues; i++) {                     // get next cells that cues indicate	
-			cueStep[i] = new Pos();
-			cueStep[i].x = rat.xPos + stepSize*Math.cos(visCues[i].randVect[curX][curY]);  // BUG FIX ON 2/4/2019, was [curY][curY]
-			cueStep[i].y = rat.yPos + stepSize*Math.cos(visCues[i].randVect[curX][curY]);
-		}
-		
-		for(i=0; i<numCues; i++) {      // choose index of cue indicating best step (-1 if none)	
-			nx = (int) cueStep[i].x;
-			ny = (int) cueStep[i].y;
-			if(maze.centerDist(nx, ny) <= radius) {
-				tempScore = maze.memArena[nx][ny].comWeight * maze.memArena[nx][ny].platWeight;
-				tempScore *= visCues[i].confidence[nx][ny]; 
-				if(score < tempScore) {
-					score = tempScore;
-					best = i;
-				}
-			}
-		}
-		
-		if(best != -1) {    // compare best visual cue angle with angle from memory, select the best one
-			tempScore = maze.memArena[(int) x][(int) y].comWeight * maze.memArena[(int) x][(int) y].platWeight;
-			tempScore /= numCues; 
-			if(score > tempScore) {
-				tempAngle = visCues[best].randVect[curX][curY];
-				x = cueStep[best].x;
-				y = cueStep[best].y;
-			}
-		}
-		
-		rat.setDirection(tempAngle);  // update rat data
-		rat.setLocation(x, y);
+		//AdHocStep next = new AdHocStep();
+		BayesianStep next = new BayesianStep();
+		//Step next = new Step();
+		rat = next.bestNextStep(rat.xPos, rat.yPos, maze.memArena, visCues.cues);
 		
 		if(maze.arena[curX][curX].dirVect == -1) // update maze data
-			maze.arena[curX][curY].dirVect = tempAngle;
+			maze.arena[curX][curY].dirVect = rat.direction;
 		else
-			maze.arena[curX][curY].dirVect += tempAngle;
+			maze.arena[curX][curY].dirVect += rat.direction;
 		
-		curX = (int) x;   // update sim data
-		curY = (int) y;
+		curX = (int) rat.xPos;   // update sim data
+		curY = (int) rat.yPos;
 		maze.arena[curX][curY].visited += 1;  // new cell visited (initially start not counted)
 	}
 	
@@ -167,70 +109,18 @@ public class Simulation extends PhysData implements Serializable {
 		 
 	}
 	
-	void updateCues() {
-		/*
-	  		modify the direction pointed to by and confidence in a cue, cell-by-cell,
-	  		by computing weight similar to comwt for confidence offset dCi,
-	  		and computing Ci = (Ci + dCi)/(summation Ci+dCi) to normalise,
-	  		and modifying direction Di as DiCi + Tavg(1-Ci), 
-	  		updating Ci and Di independently for each cue i, in each vell visited in the trial
-		*/
-		int i, j, k, offset;
-		double totalconf;
-		CueData oldcues[] = new CueData[maxCues];
-
-		for(i=0; i<numCues; i++)
-			oldcues[i] = new CueData(visCues[i]);       // store old values to use in modifying
-
-		// update confidence based on offset between average direction and cue vector
-		for(i=0; i<diameter; i++)
-			for(j=0; j<diameter; j++)
-				if(maze.arena[i][j].visited > 0 && maze.arena[i][j].dirVect != -1) { // valid cell visited	
-					for(k=0; k<numCues; k++) { // for each cue k, compute new confidence Ck+dCk				 
-						offset = radToDeg(oldcues[k].randVect[i][j] - maze.arena[i][j].dirVect);
-						if(offset < 0) 
-							offset = -offset; // modulus of angle distance
-						if(offset > 360-offset)
-							offset = 360 - offset;  // the smaller distance is considered 
-						visCues[k].confidence[i][j] += 1 - (offset/18)*0.1;
-					}
-				}
-		// divide confidence of each cue by total confidence of all cues, for a cell
-		for(i=0; i<diameter; i++)
-			for(j=0; j<diameter; j++)
-				if(maze.arena[i][j].visited > 0 && maze.arena[i][j].dirVect != -1) { // for each valid cell			 
-					totalconf = 0;
-					for(k=0; k<numCues; k++)
-						totalconf += visCues[k].confidence[i][j]; // find summation Ck+dCk
-					if(totalconf > 0)
-						for(k=0; k<numCues; k++)
-							visCues[k].confidence[i][j] /= totalconf; // divide each Ck+dCk by summation 
-				}
-		// modify direction pointed to based on offset from average, and confidence
-		for(i=0; i<diameter; i++)
-			for(j=0; j<diameter; j++)
-				if(maze.arena[i][j].visited > 0 && maze.arena[i][j].dirVect != -1) { // valid cell visited				
-					for(k=0; k<numCues; k++) { // for each cue, compute new direction 					
-						totalconf = oldcues[k].confidence[i][j];
-						visCues[k].randVect[i][j] *= totalconf; 
-						visCues[k].randVect[i][j] += maze.arena[i][j].dirVect*(1-totalconf);
-					}
-				}
-	}
-	
 	public void runSimulation() {
 		maze.getNewArena();
 		if(monteCarloSearch()) { // perform the search	
 			successes++;           // if successful, increment total number of successes
+			maze.getTrialOutcome(true);
 		}
-		maze.findAverageDirection();;     // average out all direction vectors
-		maze.findCenterMass();        // compute CoM
-		maze.findCenterAngle();       // compute angle of cell to CoM
-		maze.computeComWeight();             // compute weight to store
-		maze.computePlatWeight();      // compute inverse distance of CoM from platform     
+		else
+			maze.getTrialOutcome(false);
+		
 		maze.updateMemory();         // update trial results to stored arena
-		updateCues();                // update cue results
-		printInfo();
+		visCues.updateCues(maze.arena);                // update cue results
+		//printInfo();
 	}
 	
 	void storeData(String filename) {

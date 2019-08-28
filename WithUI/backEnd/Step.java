@@ -18,7 +18,7 @@ public class Step extends PhysData {
 		double angle, nx, ny;
 		
 		do {               // get a valid random angle			
-			angle = degToRad((int) Math.floor(Math.random()*360));
+			angle = degToRad((int)(Math.random()*360));
 			nx = x + stepSize*Math.cos(angle);
 			ny = y + stepSize*Math.sin(angle);
 		} while(centerDist(nx, ny) > radius);
@@ -26,12 +26,12 @@ public class Step extends PhysData {
 		return angle;
 	}
 	
-	double[] evaluate(double x, double y) {
+	ParticleData bestNextStep(double x, double y, ArenaCell[][] memArena, CueData[] cues) {
 		double angle = validRandomAngle(x, y),
 				nx = x + stepSize*Math.cos(angle),
 				ny = y + stepSize*Math.sin(angle);
 		
-		return new double[] {nx, ny};
+		return new ParticleData(nx, ny, angle);
 	}
 }
 
@@ -39,13 +39,13 @@ class AdHocStep extends Step {
 
 	private static final long serialVersionUID = 1L;
 	
-	EvalStep memoryStep(double x, double y, Arena maze) {
+	EvalStep memoryStep(double x, double y, ArenaCell[][] memArena) {
 		int cx = (int)x, cy = (int)y;
-		double angle, score, nx, ny;
+		double angle, score=0, nx, ny;
 		
-		if(maze.memArena[cx][cy].visited > 0) { // get angle based on memory calculations	
-			score = maze.memArena[cx][cy].comWeight * maze.memArena[cx][cy].platWeight;
-			angle = degToRad((int) (Math.floor(Math.random()*360)*(1-score) + maze.memArena[cx][cy].dirVect*score));
+		if(memArena[cx][cy].visited > 0) {                          // get angle based on memory calculations	
+			score = memArena[cx][cy].comWeight * memArena[cx][cy].platWeight;
+			angle = degToRad((int) (Math.floor(Math.random()*360)*(1-score) + memArena[cx][cy].dirVect*score));
 			
 			nx = x + stepSize*Math.cos(angle);
 			ny = y + stepSize*Math.sin(angle);
@@ -58,12 +58,12 @@ class AdHocStep extends Step {
 
 		nx = x + stepSize*Math.cos(angle);
 		ny = y + stepSize*Math.sin(angle);
-		score = (maze.memArena[(int) nx][(int) ny].comWeight * maze.memArena[(int) x][(int) y].platWeight);
+		score = (memArena[(int) nx][(int) ny].comWeight * memArena[(int) x][(int) y].platWeight);
 		
 		return new EvalStep(angle, score);
 	}
 	
-	EvalStep cueStep(double x, double y, Arena maze, CueData[] cues) {
+	EvalStep cueStep(double x, double y, ArenaCell[][] memArena, CueData[] cues) {
 		int numCues = cues.length;
 		class Pos {
 			double x;
@@ -76,14 +76,14 @@ class AdHocStep extends Step {
 		for(i=0; i<numCues; i++) {                     // get next cells that cues indicate	
 			cueStep[i] = new Pos();
 			cueStep[i].x = x + stepSize*Math.cos(cues[i].randVect[cx][cy]);
-			cueStep[i].y = y + stepSize*Math.cos(cues[i].randVect[cx][cy]);
+			cueStep[i].y = y + stepSize*Math.sin(cues[i].randVect[cx][cy]);  // BUG FIX on 28/8/19, was Math.cos
 		}
 		
 		for(i=0; i<numCues; i++) {      // choose index of cue indicating best step (-1 if none)	
 			nx = (int) cueStep[i].x;
 			ny = (int) cueStep[i].y;
 			if(centerDist(nx, ny) <= radius) {
-				score = maze.memArena[nx][ny].comWeight * maze.memArena[nx][ny].platWeight * cues[i].confidence[nx][ny]; 
+				score = memArena[nx][ny].comWeight * memArena[nx][ny].platWeight * cues[i].confidence[nx][ny]; 
 				if(topScore < score) {
 					topScore = score;
 					best = i;
@@ -91,8 +91,9 @@ class AdHocStep extends Step {
 			}
 		}
 		
-		if(best != -1)     
+		if(best != -1) 
 			angle = cues[best].randVect[cx][cy];    // top score already computed
+		
 		else {
 			angle = -1;
 			topScore = -1;
@@ -100,21 +101,105 @@ class AdHocStep extends Step {
 		return new EvalStep(angle, topScore);
 	}
 	
-	double[] evaluate(double x, double y, Arena maze, CueData[] cues) {
-		EvalStep memAngle = memoryStep(x, y, maze),
-				cueAngle = cueStep(x, y, maze, cues);
+	ParticleData bestNextStep(double x, double y, ArenaCell[][] memArena, CueData[] cues) {
+		EvalStep memAngle = memoryStep(x, y, memArena),
+				cueAngle = cueStep(x, y, memArena, cues);
 
-		double nx, ny;
+		double nx, ny, angle;
 		
-		if(cueAngle.angle == -1 || memAngle.eval/cues.length >= cueAngle.eval) {  // normalize memory evaluation with numCues
-			nx = x + stepSize*Math.cos(memAngle.angle);
-			ny = y + stepSize*Math.sin(memAngle.angle);
-		} 
-		else {
-			nx = x + stepSize*Math.cos(cueAngle.angle);
-			ny = y + stepSize*Math.sin(cueAngle.angle);
+		if(cueAngle.angle == -1 || memAngle.eval/cues.length >= cueAngle.eval)  // normalize memory evaluation with numCues
+			angle = memAngle.angle;
+		else 
+			angle = cueAngle.angle;
+
+		nx = x + stepSize*Math.cos(angle);
+		ny = y + stepSize*Math.sin(angle);
+		
+		return new ParticleData(nx, ny, angle);
+	}
+}
+
+class BayesianStep extends Step {
+
+	private static final long serialVersionUID = 1L;
+	
+	EvalStep memoryStep(double x, double y, ArenaCell[][] memArena) {
+		int cx = (int)x, cy = (int)y;
+		double angle, score, nx, ny;
+		
+		if(memArena[cx][cy].trials > 0) { // get angle based on memory calculations	
+			score = memArena[cx][cy].successes / memArena[cx][cy].trials;
+			angle = degToRad((int) (Math.floor(Math.random()*360)*(1-score) + memArena[cx][cy].dirVect*score));
+			
+			nx = x + stepSize*Math.cos(angle);
+			ny = y + stepSize*Math.sin(angle);
+			if(centerDist((int)nx, (int)ny) > radius) {
+				angle = validRandomAngle(x, y);
+			}
+		}
+		else
+			angle = validRandomAngle(x, y);
+
+		nx = x + stepSize*Math.cos(angle);
+		ny = y + stepSize*Math.sin(angle);
+		score = 0; //memArena[(int) nx][(int) ny].successes / memArena[(int) x][(int) y].trials;
+		
+		return new EvalStep(angle, score);
+	}
+	
+	EvalStep cueStep(double x, double y, ArenaCell[][] memArena, CueData[] cues) {
+		int numCues = cues.length;
+		class Pos {
+			double x;
+			double y;
+		}
+		Pos cueStep[] = new Pos[numCues];
+		double score, topScore = 0, angle;
+		int nx, ny, i, cx = (int)x, cy = (int)y, best = -1;
+		
+		for(i=0; i<numCues; i++) {                     // get next cells that cues indicate	
+			cueStep[i] = new Pos();
+			cueStep[i].x = x + stepSize*Math.cos(cues[i].randVect[cx][cy]);
+			cueStep[i].y = y + stepSize*Math.sin(cues[i].randVect[cx][cy]);  // BUG FIX on 28/8/19, was Math.cos
 		}
 		
-		return new double[] {nx, ny};
+		for(i=0; i<numCues; i++) {      // choose index of cue indicating best step (-1 if none)	
+			nx = (int) cueStep[i].x;
+			ny = (int) cueStep[i].y;
+			if(centerDist(nx, ny) <= radius && memArena[nx][ny].trials > 0) {
+				score = memArena[nx][ny].successes / memArena[nx][ny].trials * cues[i].confidence[nx][ny]; 
+				if(topScore < score) {
+					topScore = score;
+					best = i;
+				}
+			}
+		}
+		
+		if(best != -1) 
+			angle = cues[best].randVect[cx][cy];    // top score already computed
+		
+		else {
+			angle = -1;
+			topScore = -1;
+		}
+		return new EvalStep(angle, topScore);
+	}
+	
+	ParticleData bestNextStep(double x, double y, ArenaCell[][] memArena, CueData[] cues) {
+
+		EvalStep memAngle = memoryStep(x, y, memArena),
+				cueAngle = cueStep(x, y, memArena, cues);
+
+		double nx, ny, angle;
+		
+		if(cueAngle.angle == -1 || memAngle.eval/cues.length >= cueAngle.eval)  // normalize memory evaluation with numCues
+			angle = memAngle.angle;
+		else 
+			angle = cueAngle.angle;
+
+		nx = x + stepSize*Math.cos(angle);
+		ny = y + stepSize*Math.sin(angle);
+		
+		return new ParticleData(nx, ny, angle);
 	}
 }

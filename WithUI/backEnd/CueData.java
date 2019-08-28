@@ -51,7 +51,7 @@ public class CueData extends PhysData implements Serializable {
 			 for(int j=0; j<diameter; j++) {
 				 celldist = Math.sqrt(Math.pow(i-xPos,2) + Math.pow(j-yPos,2));
 				 confidence[i][j] = 1/(platDist*celldist);
-				 randVect[i][j] = degToRad((int) (Math.random()%360));
+				 randVect[i][j] = Math.random()%(2*Math.PI);
 			 }
 	}
 	
@@ -67,7 +67,7 @@ public class CueData extends PhysData implements Serializable {
 				if(centdist > radius) 
 					System.out.print("\t");
 				else 
-					System.out.print(confidence[i][j] + "\t");
+					System.out.printf("%.3f\t", confidence[i][j]);
 			}
 			System.out.println("\n\n");
 		}
@@ -79,7 +79,7 @@ public class CueData extends PhysData implements Serializable {
 				if(centdist > radius) 
 					System.out.print("\t");
 				else 
-					System.out.print(randVect[i][j] + "\t");
+					System.out.print(radToDeg(randVect[i][j]) + "\t");
 			}
 			System.out.println("\n\n");
 		}

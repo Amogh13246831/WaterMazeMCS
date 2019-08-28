@@ -8,6 +8,16 @@ public class ParticleData implements Serializable {
 	double yPos;
 	double direction;
 	
+	public ParticleData() {
+		
+	}
+	
+	public ParticleData(double x, double y, double angle) {
+		xPos = x;
+		yPos = y;
+		direction = angle;
+	}
+	
 	void setLocation(double x, double y)
 	{
 		xPos = x;

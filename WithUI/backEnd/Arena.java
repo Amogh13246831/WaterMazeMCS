@@ -1,9 +1,10 @@
 package backEnd;
 import java.io.Serializable;
+import java.util.Random;
 
 public class Arena extends PhysData implements Serializable {
 	
-
+	Random random = new Random(System.currentTimeMillis());
 	private static final long serialVersionUID = 1L;
 	ArenaCell arena[][];
 	ArenaCell memArena[][];
@@ -28,7 +29,6 @@ public class Arena extends PhysData implements Serializable {
 				memArena[i][j] = new ArenaCell();
 			}
 		
-		center = new PathType(radius, radius);
 		platQuad = new PathType(0, 90);
 		startCell = new PathType();
 		centerMass = new PathType();
@@ -47,7 +47,7 @@ public class Arena extends PhysData implements Serializable {
 	}
 	
 	void getNewArena() {
-		// initialise the maze and path storage to be used in the current trial
+		// Initialize the maze and path storage to be used in the current trial
 		arena = new ArenaCell[diameter][diameter];
 		for(int i=0; i< diameter; i++)
 			for(int j=0; j<diameter; j++) {
@@ -68,7 +68,7 @@ public class Arena extends PhysData implements Serializable {
 		double sAngle;
 		int temp; 
 		do {
-			temp = (int) (Math.random()%360); // randomize angle
+			temp = random.nextInt(360); // randomize angle
 		} while(temp>platQuad.x && temp<platQuad.y); // until not in platform quadrant
  
 		/*
@@ -78,6 +78,17 @@ public class Arena extends PhysData implements Serializable {
 		sAngle = degToRad(temp);
 		startCell.x = (int) (center.x + radius*Math.cos(sAngle)); 
 		startCell.y = (int) (center.y + radius*Math.sin(sAngle)); 
+	}
+	
+	void findCellResults(boolean success) {
+	// update the number of trials (and successes if needed) for each cell	
+		 for(int i=0; i<diameter; i++)
+			 for(int j=0; j<diameter; j++)  
+				 if(centerDist(i,j)<=radius && arena[i][j].visited > 0) { // valid visited cell
+					 arena[i][j].trials = 1;
+					 if(success) 
+						 arena[i][j].successes = 1;
+				 }
 	}
 	
 	void findAverageDirection() {
@@ -170,6 +181,15 @@ public class Arena extends PhysData implements Serializable {
 			 }
 	}
 	
+	void getTrialOutcome(boolean success) {
+		findCellResults(success);
+		findAverageDirection();     // average out all direction vectors
+		findCenterMass();        // compute CoM
+		findCenterAngle();       // compute angle of cell to CoM
+		computeComWeight();             // compute weight to store
+		computePlatWeight();      // compute inverse distance of CoM from platform    
+	}
+	
 	void updateMemory() {                        
 		/*
 	  		update the stored data with the results of the current trial, 
@@ -219,6 +239,9 @@ public class Arena extends PhysData implements Serializable {
 					// sum up the visits and divide by the total number of visits for average    
 					memArena[i][j].visited += arena[i][j].visited;   
 					memArena[i][j].platWeight /= memArena[i][j].visited;
+					
+					memArena[i][j].trials += arena[i][j].trials; // update trials including that cell
+					memArena[i][j].successes += arena[i][j].successes; // do the same for successes
 				}    
 				// else, cell not visited in this trial, so no memory change
 	}
@@ -293,7 +316,7 @@ public class Arena extends PhysData implements Serializable {
 		System.out.println("Inverse Distance: " + invDist);
 	}
 
-	void printStored() {
+	void printAdHocStored() {
 		// print the data stored in memory
 
 		int i, j, total = 0;
@@ -310,7 +333,7 @@ public class Arena extends PhysData implements Serializable {
 			}
 			System.out.println("\n\n");
 		}
-	 
+/*	 
 		System.out.println("ComWeight in Memory:");
 		for(i=0; i<diameter; i++) {
 			for(j=0; j<diameter; j++) {
@@ -336,20 +359,22 @@ public class Arena extends PhysData implements Serializable {
 			}
 			System.out.println("\n\n");
 		}
-		
+		*/
 		System.out.println("Product of Weights in Memory:");
 		for(i=0; i<diameter; i++) {
 			for(j=0; j<diameter; j++) {
 				if(centerDist(i,j) > radius)
 					System.out.print("\t");
 				else if(memArena[i][j].visited > 0)
-					System.out.print(memArena[i][j].platWeight*memArena[i][j].comWeight + "\t");
+					System.out.printf("%.2f\t", memArena[i][j].platWeight*memArena[i][j].comWeight);
 				else
 					System.out.print(-1 + "\t");
 			}
 			System.out.println("\n\n");
 		}
 	 
+
+		
 		for(i=0; i<diameter; i++) {
 			for(j=0; j<diameter; j++) {
 				total += memArena[i][j].visited;
@@ -357,4 +382,55 @@ public class Arena extends PhysData implements Serializable {
 		}
 		System.out.println("Total visits:" + total);
 	}	
+	
+	void printBayesianStored() {
+		int i, j, total=0;
+		
+		System.out.println("Trials:");
+		for(i=0; i<diameter; i++) {
+			for(j=0; j<diameter; j++) {
+				if(centerDist(i,j) > radius)
+					System.out.print("\t");
+				else if(memArena[i][j].visited > 0)
+					System.out.print(memArena[i][j].trials + "\t");
+				else
+					System.out.print(-1 + "\t");
+			}
+			System.out.println("\n\n");
+		}
+		
+		System.out.println("Successes:");
+		for(i=0; i<diameter; i++) {
+			for(j=0; j<diameter; j++) {
+				if(centerDist(i,j) > radius)
+					System.out.print("\t");
+				else if(memArena[i][j].visited > 0)
+					System.out.print(memArena[i][j].successes + "\t");
+				else
+					System.out.print(-1 + "\t");
+			}
+			System.out.println("\n\n");
+		}
+
+		System.out.println("Average Direction Vector:");
+		for(i=0; i<diameter; i++) {
+			for(j=0; j<diameter; j++) {
+				if(centerDist(i,j) > radius)
+					System.out.print("\t");
+				else if(memArena[i][j].visited > 0 && memArena[i][j].dirVect != -1)
+					System.out.print(radToDeg(memArena[i][j].dirVect) + "\t");
+				else
+					System.out.print(-1 + "\t");
+			}
+			System.out.println("\n\n");
+		}
+		
+		
+		for(i=0; i<diameter; i++) {
+			for(j=0; j<diameter; j++) {
+				total += memArena[i][j].visited;
+			}
+		}
+		System.out.println("Total visits:" + total);
+	}
 }

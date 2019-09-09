@@ -55,7 +55,7 @@ public class WaterMazeApp {
 	 */
 	private void initialize() {
 		frmWaterMazeSimulator = new JFrame();
-		frmWaterMazeSimulator.setTitle("Water Maze Simulator: Developed Model");
+		frmWaterMazeSimulator.setTitle("Water Maze Simulator: Bayesian Model");
 		frmWaterMazeSimulator.setBounds(100, 100, 700, 450);
 		frmWaterMazeSimulator.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmWaterMazeSimulator.getContentPane().setLayout(null);

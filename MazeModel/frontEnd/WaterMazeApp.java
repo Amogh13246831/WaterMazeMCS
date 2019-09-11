@@ -7,6 +7,7 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import backEnd.GridPoint;
+import backEnd.WaterMazeSimulation;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -26,6 +27,8 @@ public class WaterMazeApp {
 	MazeDrawing mazeDrawing;
 	private JLabel lblCueDisplay;
 	private JLabel lblCuesSetTo;
+	private JTextField tfStoreFile;
+	private JTextField tfLoadFile;
 	
 	/**
 	 * Launch the application.
@@ -180,6 +183,72 @@ public class WaterMazeApp {
 		lblCueDisplay.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		lblCueDisplay.setBounds(30, 158, 175, 20);
 		frmWaterMazeSimulator.getContentPane().add(lblCueDisplay);
+		
+		JLabel lblNewLabel = new JLabel("RESULTS");
+		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblNewLabel.setBounds(30, 189, 175, 23);
+		frmWaterMazeSimulator.getContentPane().add(lblNewLabel);
+		
+		JButton btnTrial = new JButton("Trials");
+		btnTrial.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		btnTrial.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			}
+		});
+		btnTrial.setBounds(30, 210, 76, 23);
+		frmWaterMazeSimulator.getContentPane().add(btnTrial);
+		
+		JButton btnSuccess = new JButton("Successes");
+		btnSuccess.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		btnSuccess.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		btnSuccess.setBounds(116, 210, 89, 23);
+		frmWaterMazeSimulator.getContentPane().add(btnSuccess);
+
+		tfStoreFile = new JTextField();
+		tfStoreFile.setBounds(119, 258, 86, 20);
+		frmWaterMazeSimulator.getContentPane().add(tfStoreFile);
+		tfStoreFile.setColumns(10);
+		
+		tfLoadFile = new JTextField();
+		tfLoadFile.setColumns(10);
+		tfLoadFile.setBounds(119, 292, 86, 20);
+		frmWaterMazeSimulator.getContentPane().add(tfLoadFile);
+		
+		JButton btnStore = new JButton("STORE");
+		btnStore.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		btnStore.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				String fileName = tfStoreFile.getText();
+				if(fileName.equals(""))
+					showStatus("Enter STORE filename");
+				else {
+					mazeDrawing.sim.storeData(fileName);
+					showStatus("Data stored!");
+				}
+			}
+		});
+		btnStore.setBounds(30, 255, 76, 23);
+		frmWaterMazeSimulator.getContentPane().add(btnStore);
+		
+		JButton btnLoad = new JButton("LOAD");
+		btnLoad.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		btnLoad.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				String fileName = tfLoadFile.getText();
+				if(fileName.equals(""))
+					showStatus("Enter LOAD filename");
+				else {
+					mazeDrawing.sim = WaterMazeSimulation.readData(fileName);
+					cueSet = true;
+					showStatus("Data loaded, cues set!");
+				}
+			}
+		});
+		btnLoad.setBounds(30, 289, 76, 23);
+		frmWaterMazeSimulator.getContentPane().add(btnLoad);
 		
 	}
 	

@@ -52,18 +52,6 @@ public class MazeDrawing extends JPanel {
 		this.setBackground(Color.WHITE);
 		g.drawOval(baseX, baseY, scale(14), scale(14));
 		
-		if(displayLocs == true) {
-			for(int i=0; i<MazeParameters.DIAMETER; i++)
-			{	
-				for(int j=0; j<MazeParameters.DIAMETER; j++)
-					if(sim.maze.centerDist(i,j) > MazeParameters.radius)
-						g.drawString("\t", baseX + scale(i), baseY + scale(j));
-					else
-						g.drawString("(" + i + ", " + j + ")\t", baseX + scale(i), baseY + scale(j));
-			}
-			displayLocs = false;
-		}
-		
 		if(sim != null) {
 			g.setColor(Color.RED);
 			g.fillOval(baseX + scale(sim.maze.platform.x)-5, baseY+scale(sim.maze.platform.y)-5,
@@ -84,9 +72,9 @@ public class MazeDrawing extends JPanel {
 					g.drawLine(baseX+scale(path.get(i).x), baseY+scale(path.get(i).y), 
 							baseX+scale(path.get(i+1).x), baseY+scale(path.get(i+1).y));
 				}
-			}
+			}			
 			lblSuccesses.setText("Successes");
-			lblResult.setText(sim.successes + "/" + sim.totalTrials);
+			lblResult.setText(sim.successes + "/" + sim.totalTrials);	
 		}
 	}
 }

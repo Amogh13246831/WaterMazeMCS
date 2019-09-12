@@ -3,12 +3,11 @@ package backEnd;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Random;
-import java.util.Set;
 
 public class MazeCues extends MazeParameters implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
-	VisualCue[] cues;
+	public VisualCue[] cues;
 	int numCues;
 	
 	public MazeCues(GridPoint[] locs, int platX, int platY) {
@@ -45,11 +44,11 @@ public class MazeCues extends MazeParameters implements Serializable {
 				newConfidence[i] = cues[i].confidence[x][y] + 1 - (offset/(2*Math.PI));    // Ci = Ci + dA
 				totalNewConfidence += newConfidence[i];
 			}
-			
+			/*
 			for(VisualCue c: cues) {          // get new indicated angles
 				c.angleToNext[x][y] *= c.confidence[x][y];     
 				c.angleToNext[x][y] += arena[x][y].angleToNext * (1-c.confidence[x][y]); // Ai = AiCi + Atr(1-Ci)
-			}
+			}*/
 			
 			for(int i=0; i<cues.length; i++)   // store normalized new confidences
 				cues[i].confidence[x][y] = newConfidence[i] / totalNewConfidence;

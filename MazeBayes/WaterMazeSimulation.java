@@ -4,15 +4,16 @@ import java.io.*;
 
 public class WaterMazeSimulation extends MazeParameters implements Serializable {
 	
-	MazeCues visCues;
+	public MazeCues visCues;
 	RatPosition rat;
-	MazeArena maze;
+	public MazeArena maze;
 	
 	private static final long serialVersionUID = 1L;
-	boolean isFirstTrial;
+	boolean isSuccess;
 	int simId;
 	GridPoint current;
-	int successes;
+	public int successes;
+	public int totalTrials;
 	
 	void setCurrent(int x, int y) {
 		current = new GridPoint(x, y);
@@ -22,6 +23,7 @@ public class WaterMazeSimulation extends MazeParameters implements Serializable 
 		
 		simId = id;
 		successes = 0;
+		totalTrials = 0;
 		maze = new MazeArena();
 		rat = new RatPosition();
 		visCues = new MazeCues(cueLocs, maze.platform.x, maze.platform.y);
@@ -30,10 +32,11 @@ public class WaterMazeSimulation extends MazeParameters implements Serializable 
 	public WaterMazeSimulation(WaterMazeSimulation s) {
 		simId = s.simId;
 		successes = s.successes;
+		totalTrials = s.totalTrials;
 		visCues = s.visCues;
 		maze = s.maze;
 		rat = s.rat;
-		isFirstTrial = s.isFirstTrial;
+		isSuccess = s.isSuccess;
 		current = new GridPoint(s.current.x, s.current.y);
 	}
 	
@@ -67,7 +70,8 @@ public class WaterMazeSimulation extends MazeParameters implements Serializable 
 	
 	public void runSimulation() {
 		maze.getNewTrialArena();
-		if(monteCarloSearch()) { // perform the search	
+		totalTrials++;
+		if((isSuccess=monteCarloSearch())) { // perform the search	
 			successes++;           // if successful, increment total number of successes
 			maze.calculateTrialOutcome(true);
 		}
@@ -77,7 +81,7 @@ public class WaterMazeSimulation extends MazeParameters implements Serializable 
 		visCues.updateCues(maze.trialArena, maze.visitedCells);                // update cue results
 	}
 	
-	void storeData(String filename) {
+	public void storeData(String filename) {
 		FileOutputStream fOut = null;
 		ObjectOutputStream oOut = null;
 		try {
@@ -97,7 +101,7 @@ public class WaterMazeSimulation extends MazeParameters implements Serializable 
 		
 	}
 	
-	static WaterMazeSimulation readData(String filename) {
+	public static WaterMazeSimulation readData(String filename) {
 		FileInputStream fIn = null;
 		ObjectInputStream oIn = null;
 		try {

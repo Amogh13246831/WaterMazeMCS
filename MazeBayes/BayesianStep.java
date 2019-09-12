@@ -38,7 +38,7 @@ public class BayesianStep extends MazeParameters {
 		if(current.trials > 0 && current.angleToNext != -1) {
 			score = current.successes / current.trials;
 			angle = (randAngle * (1-score)) + (current.angleToNext * (score));     // Anext = Ar(1-W) + Amem(W)
-
+			
 			if(nextValidGridPoint(x, y, angle) != null)  // new location is within bounds
 				return angle;
 		}
@@ -63,7 +63,8 @@ public class BayesianStep extends MazeParameters {
 		GridCell nextCell;
 		GridPoint nextPoint;
 		double score, bestScore = 0, bestAngle = memAngle, nx, ny;
-		HashMap<GridPoint, Double> scores = new HashMap<>();
+		
+		//HashMap<GridPoint, Double> scores = new HashMap<>();
 		
 		nextAngles.add(memAngle);
 
@@ -71,7 +72,11 @@ public class BayesianStep extends MazeParameters {
 			nextPoint = nextValidGridPoint(x, y, angle);
 			nextCell = memoryArena[nextPoint.x][nextPoint.y];
 			score = nextCell.trials == 0? 0 : nextCell.successes/nextCell.trials;
-			
+			if(score > bestScore) {
+				bestAngle = angle;
+				bestScore = score;
+			}
+			/*
 			if(scores.containsKey(nextPoint)) 
 				score += scores.get(nextPoint);
 			if(score > bestScore) {
@@ -79,6 +84,7 @@ public class BayesianStep extends MazeParameters {
 				bestAngle = angle;
 			}
 			scores.put(nextPoint, score);		
+			*/
 		}
 		
 		nx = x + STEPSIZE*Math.cos(bestAngle);

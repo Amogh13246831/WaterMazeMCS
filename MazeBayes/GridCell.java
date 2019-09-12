@@ -4,7 +4,9 @@ import java.io.Serializable;
 public class GridCell implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
-	int visits, trials, successes;
+	int visits;
+	public int trials;
+	public int successes;
 	double angleToNext;
 	
 	public GridCell() {

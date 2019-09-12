@@ -9,7 +9,7 @@ public class MazeArena extends MazeParameters implements Serializable {
 	Random random = new Random(System.currentTimeMillis());
 	private static final long serialVersionUID = 1L;
 	GridCell trialArena[][];
-	GridCell memoryArena[][];
+	public GridCell memoryArena[][];
 
 	boolean isFirstTrial;
 	int stepCount = 0;	

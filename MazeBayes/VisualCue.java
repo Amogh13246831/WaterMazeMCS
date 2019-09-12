@@ -5,7 +5,7 @@ public class VisualCue extends MazeParameters implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	int cueNumber;  
-	GridPoint position;
+	public GridPoint position;
 	
 	GridPoint[][] nextCell;
 	double[][] angleToNext;

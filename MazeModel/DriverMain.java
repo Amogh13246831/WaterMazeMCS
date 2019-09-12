@@ -5,9 +5,9 @@ public class DriverMain {
 	public static void main(String[] args) {
 	
 		//WaterMazeSimulation s = new WaterMazeSimulation(1, new GridPoint[] {new GridPoint(13, 3), new GridPoint(0, 6), new GridPoint(8, 1)});
-		//WaterMazeSimulation s = new WaterMazeSimulation(1, new GridPoint[] {new GridPoint(13, 3), new GridPoint(0, 6)}), t = null;
+		WaterMazeSimulation s = new WaterMazeSimulation(1, new GridPoint[] {new GridPoint(13, 3), new GridPoint(0, 6)}), t = null;
 		//WaterMazeSimulation s = new WaterMazeSimulation(1, new GridPoint[] {new GridPoint(13, 3)});
-		WaterMazeSimulation s = new WaterMazeSimulation(1, new GridPoint[0]);
+		//WaterMazeSimulation s = new WaterMazeSimulation(1, new GridPoint[0]);
 		DataReporter d = new DataReporter();
 		//d.printVisualCue(s.visCues.cues[0]);
 		int maxiters = 1000;

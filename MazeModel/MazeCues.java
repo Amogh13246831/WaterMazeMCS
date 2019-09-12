@@ -2,32 +2,19 @@ package backEnd;
 
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.Random;
 
 public class MazeCues extends MazeParameters implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
-	VisualCue[] cues;
+	public VisualCue[] cues;
 	int numCues;
 	
-	public MazeCues(GridPoint[] locs, int platX, int platY) {
+	public MazeCues(GridPoint[] locs, GridPoint platform) {
 		numCues = locs.length;
 		cues = new VisualCue[numCues]; 
-		Random rand = new Random(System.currentTimeMillis());
 		
-		for(int i=0; i<numCues; i++) {
-			cues[i] = new VisualCue(i, locs[i].x, locs[i].y);
-			for(int j=0; j<DIAMETER; j++) 
-				for(int k=0; k<DIAMETER; k++) 
-					if(centerDist(j, k) <= radius) {
-						cues[i].angleToNext[j][k] = rand.nextDouble() * 2 * Math.PI;    // set a random angle
-						cues[i].confidence[j][k] = 1 / numCues;
-					}
-					else {
-						cues[i].angleToNext[j][k] = -1;
-						cues[i].confidence[j][k] = 0;
-					}
-		}
+		for(int i=0; i<numCues; i++) 
+			cues[i] = new VisualCue(i, locs[i].x, locs[i].y, platform);		
 	}
 
 	
@@ -41,7 +28,7 @@ public class MazeCues extends MazeParameters implements Serializable {
 			
 			for(int i=0; i<cues.length; i++) {                // get new confidences
 				offset = Math.abs(cues[i].angleToNext[x][y] - arena[x][y].angleToNext);  // angle difference of cue and trial
-				newConfidence[i] = cues[i].confidence[x][y] + 1 - (offset/(2*Math.PI));    // Ci = Ci + dA
+				newConfidence[i] = cues[i].confidence[x][y] + 1 - (radToDeg(offset)/18)*0.1;    // Ci = Ci + dA
 				totalNewConfidence += newConfidence[i];
 			}
 			

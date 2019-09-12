@@ -6,7 +6,6 @@ public class DataReporter extends MazeParameters {
 
 	public void printTrialArena(MazeArena arena) {
 		int i, j;
-		GridCell[][] memoryArena = arena.memoryArena;
 		
 		System.out.println("TRIAL\n\n");
 		System.out.println("Start location: (" + arena.startCell.x + ", " + arena.startCell.y + ")");
@@ -50,8 +49,8 @@ public class DataReporter extends MazeParameters {
 			for(j=0; j<DIAMETER; j++) {
 				if(centerDist(i,j) > radius)
 					System.out.print("\t");
-				else if(memoryArena[i][j].visits > 0)
-					System.out.print(radToDeg(memoryArena[i][j].angleToCom) + "\t");
+				else if(arena.trialArena[i][j].visits > 0)
+					System.out.print(radToDeg(arena.trialArena[i][j].angleToCom) + "\t");
 				else
 					System.out.print(-1 + "\t");
 			}
@@ -63,8 +62,8 @@ public class DataReporter extends MazeParameters {
 			for(j=0; j<DIAMETER; j++) {
 				if(centerDist(i,j) > radius)
 					System.out.print("\t");
-				else if(memoryArena[i][j].visits > 0)
-					System.out.printf("%.3f\t", memoryArena[i][j].comWeight);
+				else if(arena.trialArena[i][j].visits > 0)
+					System.out.printf("%.3f\t", arena.trialArena[i][j].comWeight);
 				else
 					System.out.print(-1 + "\t");
 			}
@@ -76,8 +75,8 @@ public class DataReporter extends MazeParameters {
 			for(j=0; j<DIAMETER; j++) {
 				if(centerDist(i,j) > radius)
 					System.out.print("\t");
-				else if(memoryArena[i][j].visits > 0)
-					System.out.printf("%.3f\t", memoryArena[i][j].platWeight);
+				else if(arena.trialArena[i][j].visits > 0)
+					System.out.printf("%.3f\t", arena.trialArena[i][j].platWeight);
 				else
 					System.out.print(-1 + "\t");
 			}

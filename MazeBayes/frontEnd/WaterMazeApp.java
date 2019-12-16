@@ -115,7 +115,7 @@ public class WaterMazeApp {
 						else {
 							lblCuesSetTo.setText("Cue Locations");
 							String cuePos = "";
-							GridPoint[] cueLocs = new GridPoint[] {new GridPoint(13, 3), new GridPoint(0, 6), new GridPoint(8, 0), new GridPoint(12, 12)};
+							GridPoint[] cueLocs = new GridPoint[] {new GridPoint(0, 80), new GridPoint(70, 0), new GridPoint(150, 75), new GridPoint(50, 145)};
 							for(int i=0; i<numCues; i++) {
 								cuePos += "(" + cueLocs[i].x + ", " + cueLocs[i].y + ") ";
 							}

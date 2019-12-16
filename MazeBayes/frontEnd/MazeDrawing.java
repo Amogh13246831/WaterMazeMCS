@@ -32,14 +32,14 @@ public class MazeDrawing extends JPanel {
 	}
 	
 	public void initialize(int fileNo, int numCues) {
-		GridPoint[] cueLocs = new GridPoint[] {new GridPoint(13, 3), new GridPoint(0, 6), new GridPoint(8, 0), new GridPoint(12, 12)};
+		GridPoint[] cueLocs = new GridPoint[] {new GridPoint(0, 80), new GridPoint(70, 0), new GridPoint(150, 75), new GridPoint(50, 145)};
 		sim = new WaterMazeSimulation(1, Arrays.copyOfRange(cueLocs, 0, numCues));
 		reporter = new DataReporter();
 	}
 	
 	public void runSim() {
 		sim.runSimulation();
-		reporter.printSimulation(sim);
+		//reporter.printSimulation(sim);
 		path = sim.maze.trialPath;
 	}
 	
@@ -50,12 +50,12 @@ public class MazeDrawing extends JPanel {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		this.setBackground(Color.WHITE);
-		g.drawOval(baseX, baseY, scale(14), scale(14));
+		g.drawOval(baseX, baseY, scale(MazeParameters.DIAMETER-1), scale(MazeParameters.DIAMETER-1));
 		
 		if(sim != null) {
 			g.setColor(Color.RED);
-			g.fillOval(baseX + scale(sim.maze.platform.x)-5, baseY+scale(sim.maze.platform.y)-5,
-					10, 10);
+			g.fillRect(baseX + scale(sim.maze.platformTopLeft.x), baseY+scale(sim.maze.platformTopLeft.y),
+					sim.maze.platformLength, sim.maze.platformLength);
 			
 			g.setColor(Color.GREEN);
 			for(VisualCue vc: sim.visCues.cues)

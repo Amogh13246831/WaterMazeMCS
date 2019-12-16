@@ -56,7 +56,7 @@ public class BayesianStep extends MazeParameters {
 		return angles;
 	}
 	
-	RatPosition bestNextStep(double x, double y, GridCell[][] memoryArena, VisualCue[] cues) {
+	RatPosition bestNextStep(double x, double y, GridCell[][] memoryArena, VisualCue[] cues, double prevAngle, double momentumWeight) {
 		
 		double memAngle = nextAngleFromMemory(x, y, memoryArena);
 		ArrayList<Double> nextAngles = nextAngleFromCues(x, y, memoryArena, cues);
@@ -86,6 +86,11 @@ public class BayesianStep extends MazeParameters {
 			scores.put(nextPoint, score);		
 			*/
 		}
+		
+		// add momentum
+		double tempAngle = (1-momentumWeight)*bestAngle + momentumWeight*prevAngle;
+		if(nextValidGridPoint(x, y, tempAngle) != null)
+			bestAngle = tempAngle;
 		
 		nx = x + STEPSIZE*Math.cos(bestAngle);
 		ny = y + STEPSIZE*Math.sin(bestAngle);

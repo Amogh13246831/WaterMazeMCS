@@ -26,7 +26,7 @@ public class WaterMazeSimulation extends MazeParameters implements Serializable 
 		totalTrials = 0;
 		maze = new MazeArena();
 		rat = new RatPosition();
-		visCues = new MazeCues(cueLocs, maze.platform.x, maze.platform.y);
+		visCues = new MazeCues(cueLocs, maze.platformTopLeft.x + maze.platformLength/2, maze.platformTopLeft.y + maze.platformLength/2);
 	}
 	
 	public WaterMazeSimulation(WaterMazeSimulation s) {
@@ -42,7 +42,7 @@ public class WaterMazeSimulation extends MazeParameters implements Serializable 
 	
 	void nextStep() {
 		BayesianStep next = new BayesianStep();
-		rat = next.bestNextStep(rat.xPos, rat.yPos, maze.memoryArena, visCues.cues);
+		rat = next.bestNextStep(rat.xPos, rat.yPos, maze.memoryArena, visCues.cues, rat.direction, 0.1); // changed for momentum calc
 		
 		if(maze.trialArena[current.x][current.y].angleToNext == -1)      // update step data
 			maze.trialArena[current.x][current.y].angleToNext = rat.direction;
@@ -62,7 +62,9 @@ public class WaterMazeSimulation extends MazeParameters implements Serializable 
 			 nextStep();                  // take a step and update the arena
 			 
 			 maze.trialPath.add(new GridPoint(current.x, current.y));
-			 if(current.x==maze.platform.x && current.y==maze.platform.y)  // platform encountered
+			 
+			 if((current.x >= maze.platformTopLeft.x && current.x <= maze.platformBottomRight.x) && 
+					 (current.y >= maze.platformTopLeft.y && current.y <= maze.platformBottomRight.y))  // platform encountered
 				 return true;
 		 }
 		 return false; // search ends unsuccessfully	 

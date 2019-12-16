@@ -16,7 +16,8 @@ public class MazeArena extends MazeParameters implements Serializable {
 
 	
 	public GridPoint startCell;
-	public GridPoint platform;
+	public GridPoint platformTopLeft, platformBottomRight;
+	public int platformLength = 10;
 	GridPoint platformQuadrant;
 	public ArrayList<GridPoint> trialPath;
 	HashSet<GridPoint> visitedCells;
@@ -32,12 +33,15 @@ public class MazeArena extends MazeParameters implements Serializable {
 		
 		startCell = new GridPoint();
 		platformQuadrant = new GridPoint(0, 90);
-		platform = new GridPoint();
+		platformTopLeft = new GridPoint();
+		platformBottomRight = new GridPoint();
 		
 		double pRad = 0.75 * radius;
 		double pAngle = degToRad((platformQuadrant.y - platformQuadrant.x) / 2); 
-		platform.x = (int) (center.x + pRad*Math.cos(pAngle));
-		platform.y = (int) (center.y + pRad*Math.sin(pAngle));
+		platformTopLeft.x = (int) (center.x + pRad*Math.cos(pAngle)) - platformLength/2;
+		platformTopLeft.y = (int) (center.y + pRad*Math.sin(pAngle)) - platformLength/2;
+		platformBottomRight.x = (int) (center.x + pRad*Math.cos(pAngle)) + platformLength/2;
+		platformBottomRight.y = (int) (center.y + pRad*Math.sin(pAngle)) + platformLength/2;
 		
 		trialPath = new ArrayList<>();
 		visitedCells = new HashSet<>();

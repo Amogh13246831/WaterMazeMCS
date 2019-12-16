@@ -10,7 +10,8 @@ public class DataReporter extends MazeParameters {
 		System.out.println("TRIAL\n\n");
 		System.out.println("Start location: (" + arena.startCell.x + ", " + arena.startCell.y + ")");
 	 
-		System.out.println("Platform location: (" + arena.platform.x + ", " + arena.platform.y + ")");
+		System.out.println("Platform top location: (" + arena.platformTopLeft.x + ", " + arena.platformTopLeft.y + ")");
+		System.out.println("Platform length: " + arena.platformLength);
 
 		System.out.println("Path:");
 		for(GridPoint g: arena.trialPath)
